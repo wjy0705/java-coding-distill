@@ -118,11 +118,8 @@ head -40 alibaba-java-coding/SKILL.md
 
 ## License
 
-本仓库中的内容基于各原始来源的开源协议：
-- Alibaba Java Coding Guidelines — MIT
-- Google Guava — Apache 2.0
-- 其他内容 — 知识共享（CC BY 4.0），请标注来源
+MIT License — 详见 [LICENSE](LICENSE)
 
----
+Copyright © 2026 wjy0705
 
 *Built with [女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)*
