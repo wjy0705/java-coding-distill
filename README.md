@@ -10,26 +10,37 @@
 
 ## 目录
 
-| # | Skill | 来源 | 专注领域 | 行数 |
-|---|-------|------|---------|------|
-| 1 | [阿里巴巴Java开发手册](alibaba-java-coding/SKILL.md) | 阿里巴巴 · p3c 泰山版 | 命名/OOP/集合/并发/MySQL/异常/安全 | 1,364 |
-| 2 | [Google Guava 编码模式](google-guava-patterns/SKILL.md) | Kevin Bourrillion & Google Java Team | 不可变集合/并发/缓存/IO/哈希 | 1,972 |
-| 3 | [Josh Long Spring Boot 风格](josh-long-coding-style/SKILL.md) | Josh Long (@starbuxman) | Spring Boot 架构/自动配置/测试/反模式 | 957 |
-| 4 | [Martin Fowler 架构与重构](martin-fowler-arch-style/SKILL.md) | Martin Fowler · ThoughtWorks | 重构模式/企业架构/Code Smells/技术债务 | 358 |
-| 5 | [Uncle Bob Clean Code](uncle-bob-clean-code/SKILL.md) | Robert C. Martin | SOLID/Clean Architecture/TDD/Professionalism | 518 |
-| 6 | [Harrison Chase AI Agent 架构](harrison-chase-langchain/SKILL.md) | Harrison Chase · LangChain | Chain/Agent/Tool/Memory/Spring AI 对照 | 710 |
+| # | Skill (完整版) | 极简速查版 | 来源 | 专注领域 | 完整版行数 |
+|---|---|---|---|---|---|
+| 1 | [阿里巴巴Java开发手册](alibaba-java-coding/SKILL.md) | [极简速查](alibaba-java-coding/SKILL_SHORT.md) | 阿里巴巴 · p3c 泰山版 | 命名/OOP/集合/并发/MySQL/异常/安全 | 1,364 |
+| 2 | [Google Guava 编码模式](google-guava-patterns/SKILL.md) | [极简速查](google-guava-patterns/SKILL_SHORT.md) | Kevin Bourrillion & Google Java Team | 不可变集合/并发/缓存/IO/哈希 | 1,972 |
+| 3 | [Josh Long Spring Boot 风格](josh-long-coding-style/SKILL.md) | [极简速查](josh-long-coding-style/SKILL_SHORT.md) | Josh Long (@starbuxman) | Spring Boot 架构/自动配置/测试/反模式 | 957 |
+| 4 | [Martin Fowler 架构与重构](martin-fowler-arch-style/SKILL.md) | [极简速查](martin-fowler-arch-style/SKILL_SHORT.md) | Martin Fowler · ThoughtWorks | 重构模式/企业架构/Code Smells/技术债务 | 358 |
+| 5 | [Uncle Bob Clean Code](uncle-bob-clean-code/SKILL.md) | [极简速查](uncle-bob-clean-code/SKILL_SHORT.md) | Robert C. Martin | SOLID/Clean Architecture/TDD/Professionalism | 518 |
+| 6 | [Harrison Chase AI Agent 架构](harrison-chase-langchain/SKILL.md) | [极简速查](harrison-chase-langchain/SKILL_SHORT.md) | Harrison Chase · LangChain | Chain/Agent/Tool/Memory/Spring AI 对照 | 710 |
 
 **总计：5,879 行代码规范精华**
+
+## ⚖️ 兼容性与冲突消解
+
+由于本合集包含了不同流派（如阿里开发手册与 Clean Code）的代码规范，当混用或同时加载多个 Skill 时，可能会遇到规范冲突。
+
+我们特地制定了 **[编码思维兼容性与消解指南](COMPATIBILITY.md)**，其中包含：
+*   **兼容性矩阵**：哪些风格可以安全地同时加载。
+*   **核心冲突与消解规则**：例如方法行数（阿里 80 行 vs Clean Code 5 行）、接口命名（`Impl` 后缀 vs 行为命名）的消解策略。
+*   **AI 编程助手提示词模板**：如何让大模型一次性加载多个规范且不产生风格混乱。
 
 ## 怎么用
 
 ### 作为 Skill 加载（推荐）
 
-如果使用 Hermes Agent，加载对应 Skill 后即可在对话中直接引用：
+如果使用 Hermes Agent 或其他 Agentic IDE（如 Cursor、Cline），可以直接引用对应的 Skill 文件。
 
-```
-加载 alibaba-java-coding，帮我检查这段代码的命名规范
-加载 josh-long-coding-style，review 这个 Controller
+> **💡 Token 极简优化建议**：对于日常的代码重构或快速 CR，推荐优先加载 **极简速查版**（如 `alibaba-java-coding-short` 或引用对应的 `SKILL_SHORT.md`），以大幅降低 Token 消耗并缩短 AI 响应延迟。
+
+```text
+加载 alibaba-java-coding-short，帮我检查这段代码的命名规范
+加载 josh-long-coding-style-short，review 这个 Controller
 ```
 
 ### 作为参考手册

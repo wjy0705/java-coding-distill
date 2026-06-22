@@ -38,27 +38,34 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 - Every module, class, or function should be responsible for a single part of the software's functionality.
 - **Signs of SRP violation**: a class that touches persistence, business logic, and presentation; a method that both computes a result AND formats/prints it.
 - **Example violation**:
-  ```python
-  # BAD: Three reasons to change (report format, employee data, hours policy)
-  class Employee:
-      def calculate_pay(self): ...
-      def report_hours(self): ...
-      def save(self): ...
+  ```java
+  // BAD: Three reasons to change (report format, employee data, hours policy)
+  public class Employee {
+      public double calculatePay() { ... }
+      public String reportHours() { ... }
+      public void save() { ... }
+  }
   ```
 - **Example fix**:
-  ```python
-  # GOOD: Separate concerns
-  class Employee:
-      def __init__(self, name, rate): ...
+  ```java
+  // GOOD: Separate concerns
+  public class Employee {
+      private String name;
+      private double rate;
+      // Constructor, getters, setters
+  }
   
-  class PayCalculator:
-      def calculate_pay(self, employee): ...
+  public class PayCalculator {
+      public double calculatePay(Employee employee) { ... }
+  }
   
-  class HourReporter:
-      def report_hours(self, employee): ...
+  public class HourReporter {
+      public String reportHours(Employee employee) { ... }
+  }
   
-  class EmployeeRepository:
-      def save(self, employee): ...
+  public class EmployeeRepository {
+      public void save(Employee employee) { ... }
+  }
   ```
 
 ### O — Open/Closed Principle (OCP)
@@ -68,31 +75,40 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 - Achieve via **abstraction** and **polymorphism** — depend on interfaces/abstract base classes, not concrete implementations.
 - The goal: introduce new features by writing NEW code, not editing old, tested code.
 - **Example violation**:
-  ```python
-  # BAD: Adding a new shape requires modifying draw_all()
-  def draw_all(shapes):
-      for s in shapes:
-          if s.type == "circle":
-              draw_circle(s)
-          elif s.type == "square":
-              draw_square(s)
+  ```java
+  // BAD: Adding a new shape requires modifying drawAll()
+  public void drawAll(List<Shape> shapes) {
+      for (Shape s : shapes) {
+          if ("circle".equals(s.getType())) {
+              drawCircle(s);
+          } else if ("square".equals(s.getType())) {
+              drawSquare(s);
+          }
+      }
+  }
   ```
 - **Example fix**:
-  ```python
-  # GOOD: Each shape knows how to draw itself
-  class Shape(ABC):
-      @abstractmethod
-      def draw(self): ...
+  ```java
+  // GOOD: Each shape knows how to draw itself
+  public interface Shape {
+      void draw();
+  }
   
-  class Circle(Shape):
-      def draw(self): draw_circle(self)
+  public class Circle implements Shape {
+      @Override
+      public void draw() { drawCircle(this); }
+  }
   
-  class Square(Shape):
-      def draw(self): draw_square(self)
+  public class Square implements Shape {
+      @Override
+      public void draw() { drawSquare(this); }
+  }
   
-  def draw_all(shapes):
-      for s in shapes:
-          s.draw()  # No modification needed for new shapes
+  public void drawAll(List<Shape> shapes) {
+      for (Shape s : shapes) {
+          s.draw();  // No modification needed for new shapes
+      }
+  }
   ```
 
 ### L — Liskov Substitution Principle (LSP)
@@ -101,20 +117,28 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 - If S is a subtype of T, then objects of type T should be replaceable with objects of type S **without altering the correctness** of the program.
 - Derived classes must **preserve the behavior** promised by the base class interface.
 - **Classic violation**: The `Rectangle`/`Square` problem — a Square extends Rectangle but violates width/height independence.
-  ```python
-  # BAD: Square breaks Rectangle behavior
-  class Rectangle:
-      def set_width(self, w): self.width = w
-      def set_height(self, h): self.height = h
-      def area(self): return self.width * self.height
+  ```java
+  // BAD: Square breaks Rectangle behavior (violates LSP)
+  public class Rectangle {
+      protected int width;
+      protected int height;
+      public void setWidth(int w) { this.width = w; }
+      public void setHeight(int h) { this.height = h; }
+      public int area() { return width * height; }
+  }
   
-  class Square(Rectangle):
-      def set_width(self, w):
-          self.width = w
-          self.height = w  # violates LSP — caller expects independent dims
-      def set_height(self, h):
-          self.height = h
-          self.width = h
+  public class Square extends Rectangle {
+      @Override
+      public void setWidth(int w) {
+          this.width = w;
+          this.height = w; // violates LSP — caller expects independent dimensions
+      }
+      @Override
+      public void setHeight(int h) {
+          this.height = h;
+          this.width = h;
+      }
+  }
   ```
 - **Better approach**: Use a `Shape` base class with `area()` as abstract; don't force inheritance where behavior differs.
 - **Other signs**: Overriding a method to throw `NotImplementedError` or `raise`; checking `isinstance`/`type()` before using a subtype.
@@ -125,35 +149,39 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 - Large, "fat" interfaces should be split into smaller, more specific ones.
 - A class should not be forced to implement methods it doesn't need.
 - **Example violation**:
-  ```python
-  # BAD: Fat interface
-  class Worker(ABC):
-      @abstractmethod
-      def work(self): ...
-      @abstractmethod
-      def eat(self): ...
+  ```java
+  // BAD: Fat interface
+  public interface Worker {
+      void work();
+      void eat();
+  }
   
-  class Robot(Worker):
-      def work(self): ...
-      def eat(self): raise Exception("Robots don't eat")  # forced dependency
+  public class Robot implements Worker {
+      public void work() { ... }
+      public void eat() { 
+          throw new UnsupportedOperationException("Robots don't eat"); // forced dependency
+      }
+  }
   ```
 - **Example fix**:
-  ```python
-  # GOOD: Segregated interfaces
-  class Workable(ABC):
-      @abstractmethod
-      def work(self): ...
+  ```java
+  // GOOD: Segregated interfaces
+  public interface Workable {
+      void work();
+  }
   
-  class Eatable(ABC):
-      @abstractmethod
-      def eat(self): ...
+  public interface Eatable {
+      void eat();
+  }
   
-  class Human(Workable, Eatable):
-      def work(self): ...
-      def eat(self): ...
+  public class Human implements Workable, Eatable {
+      public void work() { ... }
+      public void eat() { ... }
+  }
   
-  class Robot(Workable):
-      def work(self): ...
+  public class Robot implements Workable {
+      public void work() { ... }
+  }
   ```
 
 ### D — Dependency Inversion Principle (DIP)
@@ -163,28 +191,34 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 2. Abstractions should not depend on details. **Details should depend on abstractions.**
 - The goal is to decouple high-level policy from low-level implementation.
 - **Example violation**:
-  ```python
-  # BAD: High-level depends on low-level directly
-  class MySQLDatabase:
-      def save(self, data): ...
+  ```java
+  // BAD: High-level depends on low-level directly
+  public class MySQLDatabase {
+      public void save(String data) { ... }
+  }
   
-  class UserService:
-      def __init__(self):
-          self.db = MySQLDatabase()  # tight coupling
+  public class UserService {
+      private MySQLDatabase db = new MySQLDatabase(); // tight coupling
+      public void saveUser(String user) { db.save(user); }
+  }
   ```
 - **Example fix**:
-  ```python
-  # GOOD: Both depend on abstraction
-  class Database(ABC):
-      @abstractmethod
-      def save(self, data): ...
+  ```java
+  // GOOD: Both depend on abstraction
+  public interface Database {
+      void save(String data);
+  }
   
-  class MySQLDatabase(Database):
-      def save(self, data): ...
+  public class MySQLDatabase implements Database {
+      public void save(String data) { ... }
+  }
   
-  class UserService:
-      def __init__(self, db: Database):  # abstraction injected
-          self.db = db
+  public class UserService {
+      private final Database db;
+      public UserService(Database db) { // abstraction injected
+          this.db = db;
+      }
+  }
   ```
 
 ---
@@ -360,15 +394,19 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 - Don't pack multiple assertions into one test — if the first assertion fails, you know nothing about the rest.
 - **Limit**: Ideally 1 assert per test. Pragmatically, 2-3 assertions that all test the same **concept** are acceptable.
 - **Example approach**:
-  ```python
-  def test_should_return_0_when_no_items():
-      cart = ShoppingCart()
-      assert cart.total() == 0
+  ```java
+  @Test
+  public void shouldReturnZeroWhenNoItems() {
+      ShoppingCart cart = new ShoppingCart();
+      assertEquals(0, cart.total());
+  }
   
-  def test_should_return_item_price_with_one_item():
-      cart = ShoppingCart()
-      cart.add_item(Item(price=10))
-      assert cart.total() == 10
+  @Test
+  public void shouldReturnItemPriceWithOneItem() {
+      ShoppingCart cart = new ShoppingCart();
+      cart.addItem(new Item(10));
+      assertEquals(10, cart.total());
+  }
   ```
 
 ### FIRST Principles of Good Unit Tests
