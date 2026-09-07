@@ -23,6 +23,10 @@ description: Google Guava团队Java编码模式蒸馏 - 生产级Java集合、�
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：分析 Guava 核心源码 → 提炼 27 个核心编码模式 → 标注每个模式的状态建议（✅推荐/⚠️需迁移） → 提供代码示例对比 → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **库版本**: Google Guava 33.x（JDK 8+ 基线）
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -113,8 +117,13 @@ List<String> bad = Collections.unmodifiableList(mutable);
 ImmutableMap<String, Config> configs = ImmutableMap.<String, Config>builder()
     .put("database", dbConfig)
     .put("cache", cacheConfig)
-    .buildKeepingLast()  // Guava 31+，遇到重复key保留最后一个而非抛异常
     .build();
+
+// ✅ 数据源可能含重复 key 时（Guava 31+）：
+// buildKeepingLast() 是终止操作，直接返回 ImmutableMap，保留最后一个值而非抛异常
+ImmutableMap<String, Config> merged = ImmutableMap.<String, Config>builder()
+    .putAll(possiblyOverlappingEntries)
+    .buildKeepingLast();
 ```
 
 ### 为什么更好
@@ -435,6 +444,9 @@ import com.google.common.util.concurrent.*;
 import java.util.concurrent.*;
 
 // 创建 ListeningExecutorService
+// ⚠️ 注意：示例用 Executors 简化演示。生产环境请遵循阿里规约，
+// 用 ThreadPoolExecutor 显式指定核心参数（队列必须有界），防止 OOM：
+// new ThreadPoolExecutor(core, max, keepAlive, unit, new ArrayBlockingQueue<>(capacity), factory, policy)
 ListeningExecutorService service = MoreExecutors
     .listeningDecorator(Executors.newFixedThreadPool(10));
 
@@ -1736,6 +1748,8 @@ public class UserService {
 
 // ===== 使用 =====
 EventBus eventBus = new EventBus("default");     // 同步 EventBus
+// ⚠️ AsyncEventBus 的线程池同理：演示用 Executors，生产环境按阿里规约
+// 用 ThreadPoolExecutor 显式指定有界队列与拒绝策略
 AsyncEventBus asyncBus = new AsyncEventBus(      // 异步 EventBus
     "async", Executors.newFixedThreadPool(4));
 

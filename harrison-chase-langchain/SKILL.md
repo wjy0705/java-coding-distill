@@ -23,6 +23,10 @@ description: Harrison Chase的LangChain架构思维蒸馏 - AI Agent框架设计
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：多源信息采集（源码/文档/演讲） → 架构框架提炼（5 大核心抽象/4 种 Agent 类型/3 种 Memory 模式/Tool 设计哲学） → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **框架版本**: LangChain 0.3.x / Spring AI 1.0（API 演进快，使用前请核对最新版本）
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -174,20 +178,21 @@ ChatResponse response = chatClient.prompt()
 
 ## 3. Chain-of-Thought Patterns
 
-### 3.1 LLMChain
+### 3.1 LCEL Chain（现代写法）
 
-The simplest chain — prompt template + LLM.
+The simplest chain — prompt template + LLM。LangChain 0.2+ 使用 LCEL（LangChain Expression Language）管道操作符 `|` 组合组件。
 
 ```python
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
+# LCEL（LangChain 0.2+ 现代写法）
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
-prompt = PromptTemplate(
-    input_variables=["product"],
-    template="Write a catchy tagline for {product}."
-)
-chain = LLMChain(llm=llm, prompt=prompt)
-result = chain.run(product="a new AI-powered toaster")
+prompt = PromptTemplate.from_template("Write a catchy tagline for {product}.")
+chain = prompt | llm | StrOutputParser()   # 管道组合，可流式/并行/异步
+result = chain.invoke({"product": "a new AI-powered toaster"})
+
+# ⚠️ 遗留写法（0.1.17 废弃，0.2 起移除，勿在新代码使用）：
+# LLMChain(llm=llm, prompt=prompt).run(product=...)
 ```
 
 **Java:**
@@ -200,40 +205,41 @@ Prompt prompt = template.create(Map.of("product", "a new AI-powered toaster"));
 String result = chatClient.prompt(prompt).call().content();
 ```
 
-### 3.2 SequentialChain
+### 3.2 顺序组合（Sequential Composition）
 
-Compose chains in sequence — output of one becomes input of the next.
+Compose chains in sequence — output of one becomes input of the next。LCEL 中直接用 `|` 串联多个 Runnable。
 
 ```python
-from langchain.chains import SequentialChain
+# LCEL 顺序组合（现代写法）
+from langchain_core.runnables import RunnableLambda
 
-chain_1 = LLMChain(llm=llm, prompt=analyze_prompt, output_key="analysis")
-chain_2 = LLMChain(llm=llm, prompt=summarize_prompt, output_key="summary")
+analyze_step = prompt_analyze | llm | StrOutputParser()
+summarize_step = prompt_summarize | llm | StrOutputParser()
 
-pipeline = SequentialChain(
-    chains=[chain_1, chain_2],
-    input_variables=["document"],
-    output_variables=["summary"]
-)
+# pipeline 输出自动作为下一步输入，也可用 RunnableLambda 显式传参
+pipeline = analyze_step | RunnableLambda(lambda analysis: {"analysis": analysis}) | summarize_step
+result = pipeline.invoke({"document": text})
+
+# ⚠️ 遗留写法（0.1.17 废弃，0.2 起移除）：
+# SequentialChain(chains=[LLMChain(...), LLMChain(...)], input_variables=..., output_variables=...)
 ```
 
-**Key principle:** Each chain has explicit input/output keys. This gives you a typed contract between stages — the same philosophy as Unix pipes or Java `Function` composition.
+**Key principle:** 每个阶段有明确的输入/输出契约 — the same philosophy as Unix pipes or Java `Function` composition.
 
-### 3.3 RouterChain
+### 3.3 路由（Router）
 
-Route input to one of many specialized chains based on classification.
+Route input to one of many specialized chains based on classification。LCEL 提供 `RunnableBranch` 实现条件路由。
 
 ```python
-from langchain.chains.router import RouterChain, MultiRouteChain
+# LCEL RunnableBranch（现代写法）
+from langchain_core.runnables import RunnableBranch
 
-router = RouterChain.from_llm(
-    llm=llm,
-    destination_chains={
-        "technical": tech_chain,
-        "creative": creative_chain,
-        "default": general_chain
-    }
+router = RunnableBranch(
+    (lambda x: x["topic"] == "technical", technical_chain),
+    (lambda x: x["topic"] == "creative", creative_chain),
+    general_chain,   # 默认分支
 )
+result = router.invoke({"topic": "technical", "input": "..."})
 ```
 
 **Java analogy:** A `Router` class that uses the LLM to classify intent, then dispatches to the appropriate `Chain` bean.
@@ -501,8 +507,8 @@ def test_agent_reasoning():
 
 ```python
 # BAD: One chain that does everything
-chain = LLMChain(llm=llm, prompt=prompt)
-chain.run("analyze this, write a report, send an email, and update the database")
+chain = prompt | llm | StrOutputParser()
+chain.invoke({"topic": "analyze this, write a report, send an email, and update the database"})
 ```
 
 **Problem:** The LLM can't use tools, can't loop, can't handle errors per step.
@@ -540,7 +546,10 @@ class MyChain:
 # BAD: Buffer grows unbounded
 memory = ConversationBufferMemory()
 for turn in range(100):
-    chain.run(input=user_messages[turn], memory=memory)
+    chain.invoke(
+        {"input": user_messages[turn]},
+        config={"configurable": {"session_id": "user-42"}}  # memory 无限累积
+    )
 ```
 
 **Fix:** Set `k` (keep last N turns) or switch to SummaryMemory for long conversations.
@@ -554,7 +563,7 @@ executor = AgentExecutor(agent=agent, tools=[])
 result = executor.invoke({"input": "Translate 'hello' to French"})
 ```
 
-**Fix:** Use `LLMChain` for simple transforms, `SequentialChain` for known pipelines, agents only when tool selection or branching is needed.
+**Fix:** Use an LCEL chain (`prompt | llm | parser`) for simple transforms, `|` 串联 for known pipelines, agents only when tool selection or branching is needed.
 
 ### 7.6 Vague Tool Descriptions ❌
 
@@ -584,15 +593,15 @@ Spring AI is the closest Java ecosystem equivalent to LangChain.
 
 | LangChain | Spring AI | Notes |
 |-----------|-----------|-------|
-| `LLMChain` | `ChatClient.prompt().call()` | Spring AI is less chain-oriented, more fluent API |
+| LCEL chain (`prompt \| llm \| parser`) | `ChatClient.prompt().call()` | `LLMChain` 已于 0.2 移除，现代用 LCEL；Spring AI 更偏流式 API |
 | `Tool` | `@Tool` annotation on `@Service` beans | Very similar in concept |
 | `AgentExecutor` | `ChatClient` with tools + `@Service` orchestration | No built-in ReAct loop; implement yourself |
 | `ConversationBufferMemory` | `ChatMemory` interface | `InMemoryChatMemory`, `CassandraChatMemory` |
 | `ConversationSummaryMemory` | Manual impl via summarization chain | Not built-in; easy to add |
 | `VectorStoreRetrieverMemory` | `VectorStore` + custom memory | Combine `PineconeVectorStore` with `ChatMemory` |
 | `CallbackHandler` | Various event listeners | Spring AI has fewer hooks; use AOP |
-| `SequentialChain` | Manual composition | Spring AI doesn't have chain abstraction |
-| `RouterChain` | `@ConditionalOnProperty` / routing logic | No LLM-based routing built-in |
+| LCEL `|` 串联 / `RunnableLambda` | Manual composition | `SequentialChain` 已废弃；Spring AI 无 chain 抽象 |
+| `RunnableBranch` / LLM routing | `@ConditionalOnProperty` / routing logic | `RouterChain` 已废弃；No LLM-based routing built-in |
 
 ### Implementing a ReAct Agent in Spring Boot
 
@@ -654,7 +663,7 @@ public class ReActAgentService {
 
 ```
 Input → Is the sequence of steps known at design time?
-  ├─ YES, fixed steps → Use a Chain (LLMChain, SequentialChain)
+  ├─ YES, fixed steps → Use an LCEL Chain (`prompt | llm | parser`，多步用 `|` 串联)
   └─ NO, depends on intermediate output → Use an Agent
        └─ Is the task decomposable into clear sub-goals?
             ├─ YES → Plan-and-Execute Agent

@@ -23,6 +23,10 @@ The de facto Java coding standard in Chinese tech companies. This skill covers t
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：采集阿里官方开源规范 → 按 14 大节逐节提炼关键规则 → 辅以代码示例（正确/错误对比） → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **规范版本**: 《阿里巴巴Java开发手册》泰山版（2020 发布）
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -1060,18 +1064,18 @@ CREATE TABLE OrderItems (
 
 ### Rule 12.2 — Index Rules
 
-**Rule:** Indexes must follow specific naming: `idx_<table>_<column>` for non-unique, `uk_<table>_<column>` for unique. Do NOT over-index (max 5 indexes per table). For composite indexes, place high-selectivity columns first.
+**Rule:** Indexes must follow specific naming: `idx_字段名` for non-unique, `uk_字段名` for unique, `pk_字段名` for primary keys (泰山版原文). Do NOT over-index (max 5 indexes per table). For composite indexes, place high-selectivity columns first.
 
 **Explanation:** Proper naming helps with query analysis. Too many indexes slow down writes. The leftmost prefix rule means column order matters.
 
 ```sql
--- Correct — naming convention
-CREATE INDEX `idx_order_items_order_id` ON `order_items`(`order_id`);
-CREATE UNIQUE INDEX `uk_users_mobile` ON `users`(`mobile`);
+-- Correct — naming convention (泰山版: idx_/uk_ + 字段名)
+CREATE INDEX `idx_order_id` ON `order_items`(`order_id`);
+CREATE UNIQUE INDEX `uk_mobile` ON `users`(`mobile`);
 
 -- Composite index: put high-selectivity column first
 -- (user_id has more unique values than status)
-CREATE INDEX `idx_orders_user_status` ON `orders`(`user_id`, `status`);
+CREATE INDEX `idx_user_status` ON `orders`(`user_id`, `status`);
 -- This covers: WHERE user_id = ?, WHERE user_id = ? AND status = ?
 -- Does NOT cover: WHERE status = ?
 ```

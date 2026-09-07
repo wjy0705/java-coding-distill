@@ -19,6 +19,10 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：多源信息采集（书籍/博客/演讲） → 思维框架提炼（SOLID/Clean Code规则/Clean Architecture/TDD/Professionalism） → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **主要依据**: 《Clean Code》(2008)、《Clean Architecture》(2017)、blog.cleancoder.com
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -141,7 +145,7 @@ description: Uncle Bob的Clean Code与Clean Architecture蒸馏 - SOLID原则与�
   }
   ```
 - **Better approach**: Use a `Shape` base class with `area()` as abstract; don't force inheritance where behavior differs.
-- **Other signs**: Overriding a method to throw `NotImplementedError` or `raise`; checking `isinstance`/`type()` before using a subtype.
+- **Other signs**: Overriding a method to throw `UnsupportedOperationException`; checking `instanceof`/`getClass()` before using a subtype.
 
 ### I — Interface Segregation Principle (ISP)
 > "Clients should not be forced to depend on interfaces they do not use."

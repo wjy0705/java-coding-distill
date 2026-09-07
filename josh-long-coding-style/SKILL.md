@@ -26,6 +26,10 @@ description: Josh Long的Spring Boot编码风格蒸馏 - 生产级Spring最佳�
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：克隆分析实际 GitHub 仓库源码 → 多维度调研（编码哲学/模式/反模式/测试/架构） → 思维框架提炼 → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **技术基线**: Spring Boot 3.x / Java 17+（含 Spring Boot 1.x/2.x 历史风格对照）
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -438,7 +442,7 @@ public class ReservationRestControllerTest {
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/reservations"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)) // Spring 5.2+，勿用已废弃的 APPLICATION_JSON_UTF8
             .andExpect(MockMvcResultMatchers.jsonPath("@.[0].id").value(1L))
             .andExpect(MockMvcResultMatchers.jsonPath("@.[0].reservationName").value("Jane"));
     }

@@ -23,6 +23,10 @@ description: Martin Fowler的架构与重构思维蒸馏 - 企业应用架构与
 ### 蒸馏工具
 本 Skill 由 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 蒸馏生成。提炼流程：多源信息采集（书籍/博客/技术雷达） → 思维框架提炼（核心哲学/重构手法/架构模式/技术债务分类） → 质量验证 → Skill 装配。
 
+### 蒸馏基准
+- **主要依据**: 《Refactoring》第 2 版（2018）、《企业应用架构模式》、martinfowler.com
+- **蒸馏基准日期**: 2026-09
+
 ### 能帮你解决什么？
 | 场景 | 解决什么问题 |
 |------|------------|
@@ -42,7 +46,7 @@ description: Martin Fowler的架构与重构思维蒸馏 - 企业应用架构与
 - **Code is communication** — written primarily for human readers, not machines.
 - **Simplicity over cleverness** — the best code is boring, obvious, and easy to reason about.
 - **Names matter** — method and variable names should reveal intent. If you need a comment, extract into a method named after the intent.
-- **Three Virtues of a Programmer**: Laziness (write once, automate), Impatience (don't wait on computers), Hubris (write code worth being proud of).
+- **Three Virtues of a Programmer**（出处：Larry Wall，Perl 之父，非 Fowler 原创）: Laziness (write once, automate), Impatience (don't wait on computers), Hubris (write code worth being proud of).
 
 ### Two Hats Theory
 When coding, you are always wearing exactly one of two hats:
