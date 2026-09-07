@@ -6,20 +6,20 @@
 
 这是一个 **编码风格 Skill 合集**，通过 **[女娲 · Skill造人术](https://github.com/alchaincyf/nuwa-skill)** 从行业顶级的 Java 开源项目和工程大师的实践中深度蒸馏而成。
 
-每个 Skill 不是简单的规则罗列，而是一套**可运行的认知系统**：包含核心哲学、编码模式、反模式清单、决策启发式和代码示例，可以直接用于日常开发、Code Review 和面试准备。
+每个 Skill 是一份**结构化的规则 + 示例合集**：包含核心哲学、编码模式、反模式清单、决策启发式和正误代码对比，可以直接用于日常开发、Code Review 和面试准备。
 
 ## 目录
 
 | # | Skill (完整版) | 极简速查版 | 来源 | 专注领域 | 完整版行数 |
 |---|---|---|---|---|---|
-| 1 | [阿里巴巴Java开发手册](alibaba-java-coding/SKILL.md) | [极简速查](alibaba-java-coding/SKILL_SHORT.md) | 阿里巴巴 · p3c 泰山版 | 命名/OOP/集合/并发/MySQL/异常/安全 | 1,364 |
-| 2 | [Google Guava 编码模式](google-guava-patterns/SKILL.md) | [极简速查](google-guava-patterns/SKILL_SHORT.md) | Kevin Bourrillion & Google Java Team | 不可变集合/并发/缓存/IO/哈希 | 1,972 |
-| 3 | [Josh Long Spring Boot 风格](josh-long-coding-style/SKILL.md) | [极简速查](josh-long-coding-style/SKILL_SHORT.md) | Josh Long (@starbuxman) | Spring Boot 架构/自动配置/测试/反模式 | 957 |
-| 4 | [Martin Fowler 架构与重构](martin-fowler-arch-style/SKILL.md) | [极简速查](martin-fowler-arch-style/SKILL_SHORT.md) | Martin Fowler · ThoughtWorks | 重构模式/企业架构/Code Smells/技术债务 | 358 |
-| 5 | [Uncle Bob Clean Code](uncle-bob-clean-code/SKILL.md) | [极简速查](uncle-bob-clean-code/SKILL_SHORT.md) | Robert C. Martin | SOLID/Clean Architecture/TDD/Professionalism | 518 |
-| 6 | [Harrison Chase AI Agent 架构](harrison-chase-langchain/SKILL.md) | [极简速查](harrison-chase-langchain/SKILL_SHORT.md) | Harrison Chase · LangChain | Chain/Agent/Tool/Memory/Spring AI 对照 | 710 |
+| 1 | [阿里巴巴Java开发手册](alibaba-java-coding/SKILL.md) | [极简速查](alibaba-java-coding/SKILL_SHORT.md) | 阿里巴巴 · p3c 泰山版 | 命名/OOP/集合/并发/MySQL/异常/安全 | 1,033 |
+| 2 | [Google Guava 编码模式](google-guava-patterns/SKILL.md) | [极简速查](google-guava-patterns/SKILL_SHORT.md) | Kevin Bourrillion & Google Java Team | 不可变集合/并发/缓存/IO/哈希 | 1,575 |
+| 3 | [Josh Long Spring Boot 风格](josh-long-coding-style/SKILL.md) | [极简速查](josh-long-coding-style/SKILL_SHORT.md) | Josh Long (@starbuxman) | Spring Boot 架构/自动配置/测试/反模式 | 773 |
+| 4 | [Martin Fowler 架构与重构](martin-fowler-arch-style/SKILL.md) | [极简速查](martin-fowler-arch-style/SKILL_SHORT.md) | Martin Fowler · ThoughtWorks | 重构模式/企业架构/Code Smells/技术债务 | 305 |
+| 5 | [Uncle Bob Clean Code](uncle-bob-clean-code/SKILL.md) | [极简速查](uncle-bob-clean-code/SKILL_SHORT.md) | Robert C. Martin | SOLID/Clean Architecture/TDD/Professionalism | 497 |
+| 6 | [Harrison Chase AI Agent 架构](harrison-chase-langchain/SKILL.md) | [极简速查](harrison-chase-langchain/SKILL_SHORT.md) | Harrison Chase · LangChain | Chain/Agent/Tool/Memory/Spring AI 对照 | 559 |
 
-**总计：5,879 行代码规范精华**
+**总计：4,742 行代码规范精华**（各文件实测行数，不含速查版）
 
 ## ⚖️ 兼容性与冲突消解
 
